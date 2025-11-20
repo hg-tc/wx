@@ -203,10 +203,17 @@ async def process_kf_message(db: AsyncSession, kf_event: Dict[str, Any]):
         # 处理每条消息
         for msg in msg_list:
             try:
-                external_userid = msg.get('external_userid')
                 msg_type = msg.get('msgtype')
                 origin = msg.get('origin')  # 消息来源：3=客户发送
                 msgid = msg.get('msgid')  # 消息ID
+                
+                # 提取 external_userid（不同消息类型位置不同）
+                if msg_type == 'event':
+                    # 事件类型：external_userid 在 event 字段内
+                    external_userid = msg.get('event', {}).get('external_userid')
+                else:
+                    # 普通消息：external_userid 在顶层
+                    external_userid = msg.get('external_userid')
                 
                 logger.info(f"📝 处理客服消息 - 用户: {external_userid}, 类型: {msg_type}, 来源: {origin}, msgid: {msgid}")
                 logger.info(f"🔍 完整消息内容: {msg}")
@@ -322,11 +329,20 @@ async def process_kf_message(db: AsyncSession, kf_event: Dict[str, Any]):
                     
                     # 处理进入会话事件
                     if event_type == 'enter_session':
-                        await kf_client.send_text_message(
+                        if not external_userid:
+                            logger.warning(f"⚠️  enter_session 事件缺少 external_userid，跳过发送欢迎消息")
+                            continue
+                        
+                        logger.info(f"👋 用户进入会话，发送欢迎消息")
+                        send_result = await kf_client.send_text_message(
                             open_kfid,
                             external_userid,
                             "您好！我是智能助手，很高兴为您服务！\n\n我可以帮您：\n1️⃣ 发布或寻找服务\n2️⃣ 比价购物\n3️⃣ 查询历史记录\n\n请直接告诉我您需要什么吧！"
                         )
+                        
+                        # 如果是频率限制错误，记录但不抛异常
+                        if send_result.get('errcode') == 45009:
+                            logger.warning(f"⏰ 欢迎消息发送受限，用户发送消息时再回复")
                 
             except Exception as e:
                 logger.error(f"处理单条客服消息失败: {e}")

@@ -160,9 +160,26 @@ class KfClient:
                 result = response.json()
                 
                 if result.get("errcode", 0) != 0:
+                    errcode = result.get("errcode")
+                    errmsg = result.get("errmsg", "")
+                    
+                    # 详细的错误分析
+                    if errcode == 45009:
+                        logger.error(f"❌ API调用频率超限！")
+                        logger.warning(f"💡 解决方法：")
+                        logger.warning(f"   1. 等待 1-2 分钟后重试")
+                        logger.warning(f"   2. 减少测试频率")
+                        logger.warning(f"   3. 企业微信客服 API 限制: 每分钟约 20 次")
+                    elif errcode == 40058:
+                        logger.error(f"❌ 缺少必需参数 touser")
+                        logger.error(f"   当前 touser: {external_userid}")
+                    elif errcode == 95018:
+                        logger.error(f"❌ 会话状态不允许发送消息")
+                        logger.error(f"   可能原因: 会话在人工接待状态(state=3)或已结束(state=4)")
+                    
                     logger.error(f"发送客服消息失败: {result}")
                 else:
-                    logger.info(f"成功发送客服消息给用户 {external_userid}")
+                    logger.info(f"✅ 成功发送客服消息给用户 {external_userid}")
                 
                 return result
         except Exception as e:
