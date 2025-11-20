@@ -4,9 +4,6 @@ __pycache__/
 *$py.class
 *.so
 .Python
-venv/
-env/
-ENV/
 build/
 develop-eggs/
 dist/
@@ -19,13 +16,19 @@ parts/
 sdist/
 var/
 wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+MANIFEST
 
-# 环境变量
-.env
-.env.local
+# Virtual Environment
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
 
 # IDE
 .vscode/
@@ -33,12 +36,18 @@ wheels/
 *.swp
 *.swo
 *~
+.DS_Store
 
-# 日志
-logs/
+# Environment Variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/*.log
 *.log
 
-# 数据库
+# Database
 *.db
 *.sqlite
 *.sqlite3
@@ -47,16 +56,23 @@ logs/
 celerybeat-schedule
 celerybeat.pid
 
-# Playwright
-.playwright/
-
-# 测试
+# Testing
 .pytest_cache/
 .coverage
 htmlcov/
+.tox/
+.hypothesis/
 
-# 临时文件
+# Temporary files
 *.tmp
 *.bak
-.DS_Store
+*.swp
+*~
 
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+scripts/test_*.py
+scripts/diagnose*.py
