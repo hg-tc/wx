@@ -56,8 +56,9 @@ WECOM_SECRET=your_secret
 WECOM_TOKEN=your_token
 WECOM_ENCODING_AES_KEY=your_aes_key
 
-# 客服应用配置
-WECOM_KF_ACCOUNT_ID=your_kf_account_id
+# 客服应用配置（可选）
+# WECOM_KF_ACCOUNT_ID 需要通过 API 获取，见下方说明
+WECOM_KF_ACCOUNT_ID=
 WECOM_KF_SECRET=your_kf_secret
 
 # AI 引擎配置
@@ -96,7 +97,47 @@ alembic upgrade head
 1. 登录企业微信管理后台
 2. 进入「应用管理」→「微信客服」
 3. 创建新的客服账号
-4. 获取 `open_kfid` 和 `Secret`
+4. 记录客服应用的 `Secret`（在应用详情页）
+
+### 1.1 获取客服账号ID (open_kfid)
+
+客服账号ID不能直接在后台查看，需要通过以下方式获取：
+
+**方法1：使用脚本获取（推荐）**
+
+首先确保已配置基础参数：
+- `WECOM_CORP_ID` - 企业ID
+- `WECOM_SECRET` - 客服应用的Secret
+
+然后运行获取脚本：
+
+```bash
+# 激活虚拟环境
+source venv/bin/activate
+
+# 运行获取脚本
+python scripts/get_kf_info.py
+```
+
+脚本会自动获取所有客服账号的信息并显示 `open_kfid`。
+
+**方法2：从回调事件中提取**
+
+启动应用后，当用户首次发送消息时，企业微信会在回调事件中包含 `OpenKfId`，系统会自动记录到日志中。查看日志：
+
+```bash
+tail -f logs/uvicorn.log | grep OpenKfId
+```
+
+**方法3：调用企业微信API**
+
+```bash
+# 获取access_token
+TOKEN=$(curl -s "https://qyapi.weixin.qq.com/cgi-bin/gettoken?corpid=YOUR_CORP_ID&corpsecret=YOUR_SECRET" | jq -r .access_token)
+
+# 获取客服账号列表
+curl "https://qyapi.weixin.qq.com/cgi-bin/kf/account/list?access_token=$TOKEN"
+```
 
 ### 2. 配置回调地址
 

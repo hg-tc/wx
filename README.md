@@ -72,11 +72,18 @@ python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
    - 进入「应用管理」→「微信客服」
    - 创建新的客服账号
 
-2. **配置回调地址**
+2. **获取客服账号ID (open_kfid)**
+   ```bash
+   # 运行获取脚本
+   python scripts/get_kf_info.py
+   ```
+   将获取到的 `open_kfid` 填入 `.env` 文件的 `WECOM_KF_ACCOUNT_ID` 配置项
+
+3. **配置回调地址**
    - URL: `https://your-domain.com/api/v1/wecom/callback`
    - 设置 Token 和 EncodingAESKey
 
-3. **配置接待模式**
+4. **配置接待模式**
    - ⚠️ **重要**: 必须设置为「仅智能助手接待」
    - 否则会话状态会导致消息发送失败
 

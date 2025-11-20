@@ -17,7 +17,7 @@ logger = get_logger()
 
 async def get_kf_access_token():
     """获取客服专用access_token"""
-    url = "https://qyapi.weixin.qq.com/cgi-bin/token"
+    url = "https://qyapi.weixin.qq.com/cgi-bin/gettoken"
     params = {
         "corpid": settings.WECOM_CORP_ID,
         "corpsecret": settings.WECOM_SECRET  # 使用客服应用的Secret
