@@ -1,0 +1,19 @@
+[Unit]
+Description=WeCom Celery Beat Scheduler
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/wx
+Environment="PATH=/root/wx/venv/bin"
+ExecStart=/root/wx/venv/bin/celery -A app.tasks.celery_app beat \
+    --loglevel=INFO \
+    --logfile=/root/wx/logs/celery-beat.log
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

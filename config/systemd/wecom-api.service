@@ -1,0 +1,25 @@
+[Unit]
+Description=WeCom AI Agent API
+After=network.target postgresql.service redis.service
+
+[Service]
+Type=notify
+User=root
+Group=root
+WorkingDirectory=/root/wx
+Environment="PATH=/root/wx/venv/bin"
+ExecStart=/root/wx/venv/bin/gunicorn \
+    -k uvicorn.workers.UvicornWorker \
+    -w 4 \
+    -b 127.0.0.1:8000 \
+    --timeout 120 \
+    --access-logfile /root/wx/logs/access.log \
+    --error-logfile /root/wx/logs/error.log \
+    app.main:app
+
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+

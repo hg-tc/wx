@@ -1,0 +1,52 @@
+# Web框架
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+gunicorn==21.2.0
+pydantic==2.5.3
+pydantic-settings==2.1.0
+
+# 数据库
+sqlalchemy==2.0.25
+asyncpg==0.29.0
+psycopg2-binary==2.9.9
+alembic==1.13.1
+pgvector==0.2.4
+
+# AI能力
+openai==1.10.0
+langchain==0.1.5
+langchain-openai==0.0.5
+
+# 企业微信
+wechatpy==1.8.18
+xmltodict==0.13.0
+pycryptodome==3.20.0
+
+# 异步任务
+celery==5.3.6
+redis==5.0.1
+
+# HTTP客户端
+httpx==0.26.0
+requests==2.31.0
+
+# 爬虫
+scrapy==2.11.0
+playwright==1.41.0
+beautifulsoup4==4.12.3
+lxml==5.1.0
+
+# 工具库
+python-dotenv==1.0.0
+loguru==0.7.2
+python-jose[cryptography]==3.3.0
+passlib==1.7.4
+python-multipart==0.0.6
+
+# 数据处理
+pandas==2.2.0
+numpy==1.26.3
+
+# 监控
+prometheus-client==0.19.0
+

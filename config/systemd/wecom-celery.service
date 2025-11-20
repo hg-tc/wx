@@ -1,0 +1,27 @@
+[Unit]
+Description=WeCom Celery Workers
+After=network.target redis.service postgresql.service
+
+[Service]
+Type=forking
+User=root
+Group=root
+WorkingDirectory=/root/wx
+Environment="PATH=/root/wx/venv/bin"
+ExecStart=/root/wx/venv/bin/celery -A app.tasks.celery_app multi start worker \
+    --pidfile=/var/run/celery/%n.pid \
+    --logfile=/root/wx/logs/celery-%n%I.log \
+    --loglevel=INFO \
+    --concurrency=4
+
+ExecStop=/root/wx/venv/bin/celery -A app.tasks.celery_app multi stopwait worker \
+    --pidfile=/var/run/celery/%n.pid
+
+ExecReload=/root/wx/venv/bin/celery -A app.tasks.celery_app multi restart worker \
+    --pidfile=/var/run/celery/%n.pid
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
