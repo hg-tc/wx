@@ -245,10 +245,24 @@ async def process_kf_message(db: AsyncSession, kf_event: Dict[str, Any]):
                             logger.info(f"📊 当前会话状态: {state_name} (state={service_state})")
                         
                         # 检查是否可以发送消息
-                        can_send = service_state in [0, 1, 3]  # 0待处理、1智能助手、3人工 都可以发送
+                        # 根据官方文档: https://developer.work.weixin.qq.com/document/path/94677
+                        # send_msg API 只能在以下状态发送:
+                        # - state=0: 新接入待处理
+                        # - state=1: 由智能助手接待
+                        # state=3（人工接待）无法使用API发送！
+                        can_send = service_state in [0, 1]  # 只有0和1可以用API发送
+                        
                         if service_state == 2:
                             logger.warning(f"⚠️  会话在待接入池排队中，无法发送消息")
                             logger.warning(f"⚠️  解决方法：确保有接待人员或启用智能助手")
+                            continue  # 跳过此消息
+                        elif service_state == 3:
+                            logger.error(f"❌ 会话处于人工接待状态（state=3），send_msg API不支持此状态！")
+                            logger.error(f"💡 解决方法：")
+                            logger.error(f"   1. 去企业微信后台 > 微信客服 > 接待设置")
+                            logger.error(f"   2. 修改为「仅智能助手接待」或「智能助手接待优先」")
+                            logger.error(f"   3. 这样新会话会进入state=1，API就可以发送了")
+                            logger.error(f"   4. 当前接待人: {servicer}")
                             continue  # 跳过此消息
                         elif service_state == 4:
                             logger.warning(f"⚠️  会话已结束，无法发送消息")
