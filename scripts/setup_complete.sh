@@ -81,12 +81,27 @@ apt-get update -qq
 print_info "安装必要的系统包..."
 apt-get install -y -qq \
     nginx \
+    redis-server \
     redis-tools \
     curl \
     lsof \
     net-tools
 
 print_info "✅ 系统依赖安装完成"
+
+# 启动 Redis
+print_info "启动 Redis 服务..."
+if pgrep redis-server >/dev/null; then
+    print_info "✅ Redis 已在运行"
+else
+    redis-server --daemonize yes
+    sleep 2
+    if redis-cli ping >/dev/null 2>&1; then
+        print_info "✅ Redis 已启动"
+    else
+        print_warning "⚠️  Redis 启动失败"
+    fi
+fi
 
 # ============================================
 # 3. 安装PostgreSQL数据库

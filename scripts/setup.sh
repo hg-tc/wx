@@ -46,11 +46,27 @@ echo "  sudo -u postgres psql -c \"CREATE DATABASE wecom_db;\""
 echo "  sudo -u postgres psql -d wecom_db -c \"CREATE EXTENSION vector;\""
 echo ""
 
-# Redis配置提示
+# Redis安装和配置
 echo "==> Redis配置"
-echo "请确保Redis已安装并运行："
-echo "  sudo apt install redis-server"
-echo "  sudo systemctl start redis-server"
+if ! command -v redis-server &> /dev/null; then
+    echo "Redis未安装，正在安装..."
+    apt-get update -qq
+    apt-get install -y redis-server
+    echo "✅ Redis已安装"
+fi
+
+if ! pgrep redis-server >/dev/null; then
+    echo "启动Redis..."
+    redis-server --daemonize yes
+    sleep 2
+    if redis-cli ping >/dev/null 2>&1; then
+        echo "✅ Redis已启动"
+    else
+        echo "⚠️  Redis启动失败，请手动启动：redis-server --daemonize yes"
+    fi
+else
+    echo "✅ Redis已在运行"
+fi
 echo ""
 
 # 数据库迁移
